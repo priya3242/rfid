@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users Attendance Table</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 90%;
+            margin: 20px auto; /* Center horizontally */
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333333;
+            margin-bottom: 20px;
+            font-size: 24px; /* Adjust font size for heading */
+        }
+
+        .add-user-button {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .add-user-button button {
+            padding: 10px 20px;
+            margin-left: 10px;
+            background-color: #504d4e;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* Table Styles */
+        .table-container {
+            max-height: 400px; /* Set the maximum height for the table container */
+            overflow-y: auto; /* Enable vertical scrolling */
+            overflow-x: auto; /* Enable horizontal scrolling */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            padding: 12px;
+            text-align: left;
+            white-space: nowrap; /* Prevent wrapping of table cell content */
+        }
+
+        th {
+            background-color: #f0f0f0;
+            color: #333333;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #e9e9e9;
+        }
+
+        /* Responsive Table Styling */
+        @media (max-width: 768px) {
+            table {
+                width: 100%; /* Force table to span full width */
+                display: block; /* Allow table to be scrollable horizontally */
+            }
+        }
+
+        /* Header Styles */
+        header {
+            background-color: #333333;
+            color: #ffffff;
+            padding: 20px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        header img {
+            max-width: 100%; /* Ensure the logo is responsive */
+            height: auto;
+            display: block;
+            margin: 0 auto; /* Center the logo horizontally */
+        }
+
+        header h1 {
+            margin: 10px 0 0; /* Space below the logo and above the heading */
+            font-size: 32px; /* Adjust the font size for the main heading */
+        }
+
+        header h2 {
+            margin: 10px 0 0; /* Space below the main heading */
+            font-size: 20px; /* Adjust the font size for the subheading */
+        }
+
+        /* Footer Styles */
+        footer {
+            background-color: #333333;
+            color: #ffffff;
+            padding: 10px 0;
+            text-align: center;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h2>Track and Manage User Attendance</h2>
+    </header>
+
+    <div class="container">
+        <div class="add-user-button">
+            <a href="/add-user">
+                <button class="add_student_button">Add Student</button>
+            </a>
+            <button class="refresh" onclick="refreshTable()">Refresh</button>
+        </div>
+        
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Name</th>
+                        <th>Date</th>
+                        <th>Login Time</th>
+                        <th>Exit Time</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="attendanceTableBody">
+                    <!-- Data will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Attendance Management System</p>
+    </footer>
+    <script>
+        async function refreshTable() {
+            try {
+                const response = await fetch('/api/attendance');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch attendance data');
+                }
+
+                const data = await response.json();
+                const tableBody = document.getElementById('attendanceTableBody');
+                tableBody.innerHTML = ''; // Clear existing table rows
+
+                data.usersAttendance.forEach(user_attendance => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${user_attendance.username || ''}</td>
+                        <td>${user_attendance.name || ''}</td>
+                        <td>${user_attendance.date || ''}</td>
+                        <td>${user_attendance.login_time || ''}</td>
+                        <td>${user_attendance.exit_time || ''}</td>
+                        <td>${user_attendance.status || ''}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error fetching attendance data:', error);
+            }
+        }
+
+        // Initial load of table data on page load
+        window.addEventListener('load', refreshTable);
+    </script>
+</body>
+</html>

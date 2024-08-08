@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Cards</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 90%;
+            margin: 20px auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .button-container button {
+            padding: 10px 20px;
+            background-color: #504d4e;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            padding: 12px;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        th {
+            background-color: #f0f0f0;
+            color: #333333;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #e9e9e9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>User Details</h1>
+        <div class="button-container">
+            <button onclick="fetchNewCard()">Show New Card UID</button>
+        </div>
+        <div id="newCardId"></div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Name</th>
+                </tr>
+            </thead>
+            <tbody id="userTableBody">
+                <!-- User data will be inserted here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Fetch and display the new card UID
+        async function fetchNewCard() {
+            try {
+                const response = await fetch('/api/newcard');
+                const data = await response.json();
+                const newCardIdDiv = document.getElementById('newCardId');
+                
+                if (data.uid) {
+                    newCardIdDiv.innerHTML = `<strong>New Card UID:</strong> ${data.uid}`;
+                } else {
+                    newCardIdDiv.innerHTML = '<strong>No new card found.</strong>';
+                }
+            } catch (error) {
+                console.error('Error fetching new card UID:', error);
+            }
+        }
+
+        // Fetch and display all user details
+        async function fetchUsers() {
+            try {
+                const response = await fetch('/api/users');
+                const data = await response.json();
+                const tableBody = document.getElementById('userTableBody');
+                
+                tableBody.innerHTML = ''; // Clear existing table rows
+
+                for (const uid in data) {
+                    if (data.hasOwnProperty(uid)) {
+                        const user = data[uid];
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${user.username}</td>
+                            <td>${user.name}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        }
+
+        // Load the users data when the page loads
+        window.addEventListener('load', fetchUsers);
+    </script>
+</body>
+</html>
